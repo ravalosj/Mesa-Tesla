@@ -1,0 +1,350 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mesa Tesla 3-6-9</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: casino-table page. Marquee header, results rail, calculator on green felt, pyramid and combination chips. Single dark look by design. */
+:root{
+  --felt:#0b3a2c; --felt-deep:#06231a; --felt-line:#17604a;
+  --gold:#e5b84b; --gold-soft:#f4d98c; --ruby:#d23a45; --ivory:#f4ecd8; --muted:#a9c3b6;
+  --font-display:"Abril Fatface","Georgia",serif;
+  --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"DM Mono","SFMono-Regular",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--felt-deep);
+  background-image:radial-gradient(120% 60% at 50% 0%,var(--felt) 0%,var(--felt-deep) 70%);
+  color:var(--ivory);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 40px;
+}
+.wrap{max-width:1040px;margin:0 auto}
+a{color:var(--gold-soft)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* marquee */
+.marquee{padding-block:28px 8px;text-align:center}
+.bulbs{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.bulbs i{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px 1px rgba(229,184,75,.7);animation:blink 1.6s infinite}
+.bulbs i:nth-child(even){animation-delay:.8s}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.bulbs i{animation:none}}
+h1{font-family:var(--font-display);font-weight:400;font-size:clamp(2.4rem,9vw,4.4rem);line-height:1;margin:0;color:var(--gold);letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:10px auto 0;max-width:52ch}
+.suits{font-size:1.1rem;letter-spacing:.5em;color:var(--ivory);margin-top:10px}
+.suits .r{color:var(--ruby)}
+
+h2{font-family:var(--font-display);font-weight:400;font-size:1.7rem;margin:0 0 4px;color:var(--gold-soft);text-wrap:balance}
+.lead{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+section{margin-top:30px}
+.felt{background:rgba(6,35,26,.55);border:1px solid var(--felt-line);border-radius:18px;padding:18px}
+.felt.gold{border-color:rgba(229,184,75,.55);box-shadow:inset 0 0 0 4px rgba(6,35,26,.9),inset 0 0 0 5px rgba(229,184,75,.25)}
+
+/* results */
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:700;background:transparent;color:var(--ivory);border:1px solid var(--felt-line);border-radius:999px;padding:7px 16px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--gold);color:#2a1d00;border-color:var(--gold)}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.game{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:14px;min-width:0}
+.game h3{margin:0 0 10px;font-size:1rem;display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.game h3 a{font-size:.78rem;font-weight:500}
+.day{margin-top:10px}
+.day b{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.draws{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.draw{text-align:center;min-width:0}
+.draw small{display:block;font-size:.7rem;color:var(--muted);margin-bottom:3px}
+.chip{display:block;width:100%;padding:0;margin:0;background:none;border:0;cursor:pointer;font:inherit;color:inherit}
+.chip .digits{display:flex;justify-content:center;gap:4px}
+.chip .d{flex:1 1 0;min-width:0;max-width:72px;font-family:var(--font-mono);font-size:1.5rem;letter-spacing:.06em;font-weight:500;text-align:center;padding:8px 0;border-radius:8px;border:1px solid var(--gold);background:linear-gradient(#f9f1dc,#e9dcb8);color:#2a1d00}
+.chip:hover .d{background:var(--gold-soft)}
+.refresh{margin-left:auto;background:var(--ruby);border-color:var(--ruby);color:#fff}
+.refresh[disabled]{opacity:.6;cursor:wait}
+.chip.wait{cursor:default}
+.chip.wait .d{background:transparent;color:var(--muted);border:1px dashed var(--felt-line)}
+.chip .x{display:block;margin-top:4px;font-size:.75rem;font-weight:700;color:#ff8a93}
+.note{font-size:.8rem;color:var(--muted);margin:12px 0 0}
+.links{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;font-size:.88rem}
+
+/* calculator */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+input{width:100%;font-family:var(--font-mono);font-size:1.1rem;padding:10px 12px;border-radius:10px;border:1px solid var(--felt-line);background:var(--felt-deep);color:var(--ivory)}
+.hint{font-size:.75rem;color:var(--muted);margin-top:4px}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:16px}
+.card{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:14px;min-width:0}
+.card h3{margin:0 0 8px;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.big{font-family:var(--font-mono);font-size:2.3rem;line-height:1;color:var(--gold);font-weight:500}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-family:var(--font-mono);background:rgba(229,184,75,.14);border:1px solid rgba(229,184,75,.45);border-radius:8px;padding:3px 9px;font-size:.95rem}
+.tag.ruby{background:rgba(210,58,69,.16);border-color:rgba(210,58,69,.6)}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:.9rem;padding:3px 0;border-bottom:1px dotted var(--felt-line)}
+.kv:last-child{border:0}
+.kv span:last-child{font-family:var(--font-mono);color:var(--gold-soft)}
+.pyr{overflow-x:auto;padding-bottom:6px}
+.pyr div{display:flex;justify-content:center;gap:4px;margin-bottom:4px;width:max-content;min-width:100%}
+.pyr span{font-family:var(--font-mono);width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--felt);border:1px solid var(--felt-line);font-size:.9rem}
+.pyr .top span{background:rgba(229,184,75,.18);border-color:var(--gold)}
+.pyr .apex span{background:var(--ruby);border-color:var(--ruby);color:#fff;font-weight:700}
+.combos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));gap:10px;margin-top:16px}
+.combo{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:10px;text-align:center;min-width:0}
+.combo small{display:block;font-size:.7rem;color:var(--muted);min-height:2.1em}
+.combo .big{font-size:1.9rem;margin:2px 0}
+.combo .fam{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
+.combo em{font-style:normal;font-family:var(--font-display);color:var(--ruby);font-size:1rem}
+.tbl{overflow-x:auto;margin-top:14px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--felt-line);font-family:var(--font-mono)}
+th{font-family:var(--font-body);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+tr.today td{color:var(--gold);}
+footer{margin-top:34px;font-size:.82rem;color:var(--muted);border-top:1px solid var(--felt-line);padding-top:14px}
+</style>
+
+<div class="wrap">
+  <header class="marquee">
+    <div class="bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h1>Mesa Tesla 3-6-9</h1>
+    <p class="sub">Inverso, familia, vibración del día, jaladera y combinaciones. Ingresá los datos y la mesa calcula todo.</p>
+    <div class="suits" aria-hidden="true">♠ <span class="r">♥</span> ♣ <span class="r">♦</span></div>
+  </header>
+
+  <section id="resultados">
+    <h2>Resultados del día</h2>
+    <p class="lead">Hoy y ayer, tomados de NúmerosFuertes. Tocá un número para llevarlo a la calculadora.</p>
+    <div class="felt gold">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-cr" aria-selected="true" data-c="cr">Costa Rica</button>
+        <button class="tab" role="tab" id="tab-ni" aria-selected="false" data-c="ni">Nicaragua</button>
+        <button class="tab refresh" id="btn-ref" type="button">↻ Actualizar</button>
+      </div>
+      <div class="games" id="games"></div>
+      <p class="note" id="snap"></p>
+      <div class="links" id="links"></div>
+    </div>
+  </section>
+
+  <section id="calculadora">
+    <h2>Calculadora</h2>
+    <p class="lead">Los cálculos se actualizan al escribir.</p>
+    <div class="felt">
+      <div class="form">
+        <div><label for="f-fecha">Fecha</label><input id="f-fecha" type="date"></div>
+        <div><label for="f-num">Número (2 dígitos)</label><input id="f-num" inputmode="numeric" maxlength="2" value="87" autocomplete="off"></div>
+        <div><label for="f-ser">Serie para la jaladera</label><input id="f-ser" inputmode="numeric" maxlength="16" value="420718742887" autocomplete="off"><div class="hint">Hasta 16 dígitos</div></div>
+        <div><label for="f-den">Denominador (1 dígito)</label><input id="f-den" inputmode="numeric" maxlength="1" placeholder="Auto" autocomplete="off"><div class="hint">Vacío: usa el vértice de la jaladera</div></div>
+      </div>
+
+      <div class="out" id="out"></div>
+      <div class="combos" id="combos"></div>
+    </div>
+  </section>
+
+  <section id="tablas">
+    <h2>Vibración por día</h2>
+    <p class="lead">Cada día de la semana tiene su dígito, su decena y su repetido.</p>
+    <div class="felt"><div class="tbl"><table id="vib"><thead><tr><th>Día</th><th>Dígito</th><th>Decena</th><th>Repetido</th></tr></thead><tbody></tbody></table></div></div>
+  </section>
+
+  <footer>
+    Herramienta de consulta y entretenimiento. Los sorteos son aleatorios y ningún cálculo cambia la probabilidad de un número. Jugá con responsabilidad y solo lo que podás perder.
+  </footer>
+</div>
+
+<script>
+(function(){
+var FAM="01-10-11|00-11-10|05-12-07|08-13|06-14-09|02-15-07|04-16-09|02-17-05|03-18|04-19-06|11-00-01|10-01-00|15-02-17|18-03|16-04-19|12-05-17|14-07-19|12-07-15|13-08|14-09-16|21-50-70|20-51-71|25-52-27-72|28-53-73|26-54-29-74|22-55-27-75|24-56-29-76|25-57-55-77|23-58-78|24-59-26-79|31-80|30-81|35-82-37|38-83-88|36-84-39|32-85-37|34-86-39|32-87-35|33-88-83|34-89-36|41-60-90|40-61-91|45-62-47-92|48-63-93|46-64-49-94|42-65-47-95|44-66-49-96|42-67-45-97|43-68-98|44-69-46-99|51-20-70|50-21-71|55-22-57-72|58-23-73|56-24-59-74|52-25-57-75|54-26-59-76|55-77-52-27|53-28-78|54-29-56-79|61-40-90|60-41-91|65-42-67-92|68-43-93|66-44-69-94|62-45-67-95|64-46-69-96|62-47-65-97|63-48-98|64-49-66-99|71-20-50|70-21-51|75-22-77-52|78-23-53|76-24-79-54|72-25-77-55|74-26-79-56|72-27-75-57|73-28-58|74-29-76-59|81-30|80-31|85-32-87|88-33-38|86-34-89|82-35-87|84-36-89|82-37-85|83-38-33|84-39-86|91-40-60|90-41-61|95-42-97-62|98-43-63|96-44-99-64|92-45-97-65|94-46-99-66|92-47-95-67|93-48-98-68|94-49-96-69".split("|");
+FAM=FAM.slice(0,98).concat(["93-48-68","94-49-96-69"]).slice(0,100);
+var DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+var VIB=[5,7,3,8,9,1,6];
+var $=function(id){return document.getElementById(id)};
+function pad2(n){return String(n).padStart(2,"0")}
+function inv(n){return pad2(n).split("").map(function(d){return (+d+5)%10}).join("")}
+function fam(n){return FAM[n]||""}
+function jal(s){var rows=[s.split("").map(Number)];while(rows[rows.length-1].length>1){var p=rows[rows.length-1],r=[];for(var i=0;i<p.length-1;i++)r.push((p[i]+p[i+1])%10);rows.push(r)}return rows}
+function dsum(s){return s.split("").reduce(function(a,d){return a+ +d},0)}
+
+/* resultados (captura del 29 oct 2026, 13:35) */
+var DATA={
+ cr:{games:[
+  {n:"Nuevos Tiempos",len:4,u:"https://numerosfuertes.net/resultados/tiempos",slots:["1 PM","4:30 PM","7:30 PM"],hoy:[null,null,null],ayer:["4207","1874","2887"]},
+  {n:"Tres Monazos",len:3,u:"https://numerosfuertes.net/resultados/monazos",slots:["1 PM","4:30 PM","7:30 PM"],hoy:[null,null,null],ayer:["996","776","316"]}
+ ],links:[["Todos los de Costa Rica","https://numerosfuertes.net/resultados/costa-rica"],["Lotto y Revancha","https://numerosfuertes.net/resultados/lotto"],["Chances","https://numerosfuertes.net/resultados/chances"],["Lotería Nacional","https://numerosfuertes.net/resultados/nacional"]]},
+ ni:{games:[
+  {n:"La Diaria",len:3,u:"https://numerosfuertes.net/resultados/nica",slots:["11 AM","3 PM","9 PM"],hoy:["810",null,null],ayer:["939","571","633X3"]}
+ ],links:[["Todos los de Nicaragua","https://numerosfuertes.net/resultados/nicaragua"],["La Diaria en detalle","https://numerosfuertes.net/resultados/nica"]]}
+};
+var cur="cr";
+function pairs(s){var a=[];if(s.length%2===1){a.push(s.slice(0,1));s=s.slice(1)}for(var i=0;i<s.length;i+=2)a.push(s.slice(i,i+2));return a}
+function boxes(s){return '<span class="digits">'+pairs(s).map(function(c){return '<span class="d">'+c+'</span>'}).join("")+'</span>'}
+var MES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function lbl(o){var d=new Date();d.setDate(d.getDate()-o);return DIAS[d.getDay()]+" "+d.getDate()+" "+MES[d.getMonth()]}
+var liveAt=null;
+function chip(v,len){
+  if(!v)return '<button class="chip wait" disabled aria-label="Pendiente">'+boxes(new Array(len+1).join("?"))+'</button>';
+  var m=String(v).match(/^(\d+)(X\d+)?$/);
+  return '<button class="chip" data-d="'+m[1]+'" aria-label="Cargar '+m[1]+' en la calculadora">'+boxes(m[1])+(m[2]?'<span class="x">'+m[2]+'</span>':'')+'</button>';
+}
+function day(label,slots,arr,len){
+  return '<div class="day"><b>'+label+'</b><div class="draws">'+slots.map(function(s,i){return '<div class="draw"><small>'+s+'</small>'+chip(arr[i],len)+'</div>'}).join("")+'</div></div>';
+}
+function renderRes(){
+  var d=DATA[cur];
+  $("games").innerHTML=d.games.map(function(g){
+    return '<div class="game"><h3>'+g.n+' <a href="'+g.u+'" target="_blank" rel="noopener">Ver en NúmerosFuertes</a></h3>'+
+      day("Hoy · "+lbl(0),g.slots,g.hoy,g.len)+day("Ayer · "+lbl(1),g.slots,g.ayer,g.len)+'</div>';
+  }).join("");
+  $("links").innerHTML=d.links.map(function(l){return '<a href="'+l[1]+'" target="_blank" rel="noopener">'+l[0]+' ↗</a>'}).join("");
+  $("snap").textContent=liveAt?("Actualizado a las "+liveAt+" desde NúmerosFuertes."):"Captura del jueves 29 oct a las 13:35. Con el botón Actualizar la página consulta NúmerosFuertes; si no puede, usá el enlace \"Ver en NúmerosFuertes\".";
+  document.querySelectorAll(".tab[data-c]").forEach(function(t){t.setAttribute("aria-selected",t.dataset.c===cur)});
+}
+document.querySelectorAll(".tab[data-c]").forEach(function(t){t.addEventListener("click",function(){cur=t.dataset.c;renderRes()})});
+$("games").addEventListener("click",function(e){
+  var b=e.target.closest(".chip[data-d]");if(!b)return;
+  var d=b.dataset.d;
+  $("f-num").value=d.slice(-2);
+  $("f-ser").value=d.slice(0,16);
+  $("f-den").value="";
+  calc();
+  $("calculadora").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+/* consulta en vivo a NúmerosFuertes (a través de proxies CORS públicos) */
+var SRC={
+  cr:{url:"https://numerosfuertes.net/resultados/costa-rica",head:"Resultados Costa Rica hoy",names:["Nuevos Tiempos","Tres Monazos","Lotto y Revancha"],labels:{"Nuevos Tiempos":["1PM","4:30PM","7:30PM"],"Tres Monazos":["1PM","4:30PM","7:30PM"]}},
+  ni:{url:"https://numerosfuertes.net/resultados/nicaragua",head:"Resultados Nicaragua hoy",names:["La Diaria"],labels:{"La Diaria":["11AM","3PM","9PM"]}}
+};
+var PROXIES=[
+  function(u){return "https://corsproxy.io/?url="+encodeURIComponent(u)},
+  function(u){return "https://api.allorigins.win/raw?url="+encodeURIComponent(u)}
+];
+function getHtml(u){
+  var i=0;
+  function next(){
+    if(i>=PROXIES.length)return Promise.reject(new Error("sin acceso"));
+    var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},10000),p=PROXIES[i++](u);
+    return fetch(p,{signal:ctl.signal}).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("http");return r.text()}).catch(function(){clearTimeout(t);return next()});
+  }
+  return next();
+}
+function textOf(html){
+  var doc=new DOMParser().parseFromString(html,"text/html"),w=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT),p=[],n;
+  while((n=w.nextNode())){
+    var tg=n.parentNode&&n.parentNode.nodeName;if(tg==="SCRIPT"||tg==="STYLE"||tg==="NOSCRIPT")continue;
+    var t=n.nodeValue.replace(/\s+/g," ").trim();if(t)p.push(t);
+  }
+  return p.join(" ");
+}
+function slotVals(seg,labels){
+  return labels.map(function(l){
+    var m=seg.match(new RegExp(l.replace(":","\\:")+"\\s*([0-9?]+(?:\\s?X\\d+)?)","i"));
+    if(!m)return undefined;
+    return /\?/.test(m[1])?null:m[1].replace(/\s/g,"").toUpperCase();
+  });
+}
+function parseCountry(text,cfg){
+  var start=text.indexOf(cfg.head);if(start<0)return null;
+  var res={};
+  cfg.names.forEach(function(nm,i){
+    var s=text.indexOf(nm,start);if(s<0)return;
+    var e=text.length;
+    for(var j=i+1;j<cfg.names.length;j++){var k=text.indexOf(cfg.names[j],s+nm.length);if(k>=0){e=k;break}}
+    var q=text.indexOf("¿Querés predecir",s);if(q>=0&&q<e)e=q;
+    var sec=text.slice(s,e),lab=cfg.labels[nm];if(!lab)return;
+    var hi=sec.search(/Hoy\s*—/),ai=sec.search(/Ayer\s*—/);if(hi<0||ai<0)return;
+    var hoy=sec.slice(hi,ai),ay=sec.slice(ai),rest=ay.slice(25),cut=rest.search(/(Lunes|Martes|Miércoles|Jueves|Viernes|Sábado|Domingo)\s+\d/);
+    ay=ay.slice(0,25+(cut<0?rest.length:cut));
+    res[nm]={hoy:slotVals(hoy,lab),ayer:slotVals(ay,lab)};
+  });
+  return res;
+}
+function refresh(){
+  var btn=$("btn-ref");btn.disabled=true;btn.textContent="Consultando…";
+  var jobs=Object.keys(SRC).map(function(c){
+    return getHtml(SRC[c].url).then(function(h){
+      var r=parseCountry(textOf(h),SRC[c]);if(!r)throw new Error("formato");
+      var any=false;
+      DATA[c].games.forEach(function(g){
+        var x=r[g.n];if(!x)return;
+        ["hoy","ayer"].forEach(function(k){x[k].forEach(function(v,i){if(v!==undefined){g[k][i]=v;any=true}})});
+      });
+      if(!any)throw new Error("vacío");
+    });
+  });
+  Promise.all(jobs.map(function(p){return p.then(function(){return true},function(){return false})})).then(function(oks){
+    var ok=oks.some(Boolean),d=new Date();
+    if(ok){liveAt=pad2(d.getHours())+":"+pad2(d.getMinutes())}
+    renderRes();
+    if(!ok)$("snap").textContent="No se pudo consultar NúmerosFuertes desde acá. Se muestra la captura del 29 oct 13:35; usá \"Ver en NúmerosFuertes\" para el dato en vivo.";
+    btn.disabled=false;btn.textContent="↻ Actualizar";
+  });
+}
+$("btn-ref").addEventListener("click",refresh);
+
+/* calculadora */
+function tags(list,cls){return list.map(function(x){return '<span class="tag '+(cls||"")+'">'+x+'</span>'}).join("")}
+function calc(){
+  var fv=$("f-fecha").value,num=($("f-num").value||"").replace(/\D/g,"").slice(0,2),ser=($("f-ser").value||"").replace(/\D/g,"").slice(0,16),den=($("f-den").value||"").replace(/\D/g,"").slice(0,1);
+  var out="";
+  /* fecha */
+  var fechaCard="";
+  if(fv){
+    var p=fv.split("-"),Y=p[0],M=p[1],D=p[2],dt=new Date(+Y,+M-1,+D),w=dt.getDay();
+    var digs=D+M+Y,sd=dsum(digs),sc=(+D)+(+M)+(+Y.slice(0,2))+(+Y.slice(2));
+    var v=VIB[w];
+    fechaCard='<div class="card"><h3>Fecha · '+DIAS[w]+'</h3><div class="big">'+sc+'</div>'+
+      '<div class="kv"><span>Fecha</span><span>'+D+'/'+M+'/'+Y+'</span></div>'+
+      '<div class="kv"><span>Suma de componentes</span><span>'+D+'+'+M+'+'+Y.slice(0,2)+'+'+Y.slice(2)+' = '+sc+'</span></div>'+
+      '<div class="kv"><span>Suma de dígitos</span><span>'+sd+'</span></div>'+
+      '<div class="kv"><span>Componentes · inverso</span><span>'+inv(sc%100)+'</span></div>'+
+      '<div class="row">'+tags([v,v*10,v*11],"ruby")+'</div><div class="hint">Vibración de '+DIAS[w]+'</div></div>';
+    $("vib").querySelectorAll("tr").forEach(function(r){r.classList.remove("today")});
+    var rows=$("vib").tBodies[0].rows;for(var i=0;i<rows.length;i++)rows[i].classList.toggle("today",rows[i].dataset.w==w);
+  }
+  /* numero */
+  var numCard="";
+  if(num.length===2){
+    var n=+num;
+    numCard='<div class="card"><h3>Número</h3><div class="big">'+num+'</div>'+
+      '<div class="kv"><span>Inverso</span><span>'+inv(n)+'</span></div>'+
+      '<div class="kv"><span>Inverso del inverso</span><span>'+inv(+inv(n))+'</span></div>'+
+      '<div class="hint" style="margin-top:8px">Familia</div><div class="row">'+tags(fam(n).split("-"))+'</div></div>';
+  } else {
+    numCard='<div class="card"><h3>Número</h3><div class="hint">Escribí 2 dígitos para ver inverso y familia.</div></div>';
+  }
+  /* jaladera */
+  var rows2=ser.length>1?jal(ser):null,apex=rows2?rows2[rows2.length-1][0]:null;
+  var pyr='<div class="card" style="grid-column:1/-1"><h3>Jaladera</h3>';
+  if(rows2){
+    pyr+='<div class="pyr">'+rows2.map(function(r,i){return '<div class="'+(i===0?"top":i===rows2.length-1?"apex":"")+'">'+r.map(function(d){return '<span>'+d+'</span>'}).join("")+'</div>'}).join("")+'</div>';
+    var last2=rows2.length>=3?rows2[rows2.length-3]:null;
+    pyr+='<div class="hint">Cada fila suma los dígitos vecinos de la fila anterior y conserva la unidad. El vértice es '+apex+'.</div>';
+  } else pyr+='<div class="hint">Escribí al menos 2 dígitos.</div>';
+  pyr+='</div>';
+  $("out").innerHTML=numCard+fechaCard+pyr;
+
+  /* combinaciones */
+  var d=den!==""?+den:apex;
+  if(num.length===2&&d!==null&&d!==undefined){
+    var L=+num[0],R=+num[1];
+    var A=d,B=(L+d)%10,C=(R+d)%10,Dd=(B+C)%10,E=(A+B)%10,F=(B+Dd)%10,G=(C+Dd)%10,H=(A+C)%10;
+    var C8=[["A","Denominador",A],["B","Izq. num y den",B],["C","Der. num y den",C],["D","Suma B + C",Dd],["E","Suma A + B",E],["F","Suma B + D",F],["G","Suma C + D",G],["H","Suma A + C",H]];
+    $("combos").innerHTML=C8.map(function(c){
+      var two=pad2(c[2]*11);var f=fam(+two);
+      return '<div class="combo"><small><em>'+c[0]+'</em> '+c[1]+'</small><div class="big">'+two+'</div><div class="fam">'+f.replace(/-/g," · ")+'</div></div>';
+    }).join("");
+  } else $("combos").innerHTML="";
+}
+["f-fecha","f-num","f-ser","f-den"].forEach(function(id){$(id).addEventListener("input",calc)});
+
+/* init */
+var now=new Date(),iso=now.getFullYear()+"-"+pad2(now.getMonth()+1)+"-"+pad2(now.getDate());
+$("f-fecha").value=iso;
+$("vib").tBodies[0].innerHTML=[1,2,3,4,5,6,0].map(function(w){var v=VIB[w];return '<tr data-w="'+w+'"><td style="font-family:var(--font-body)">'+DIAS[w]+'</td><td>'+v+'</td><td>'+v*10+'</td><td>'+v*11+'</td></tr>'}).join("");
+renderRes();calc();
+refresh();
+setInterval(function(){if(!document.hidden)refresh()},300000);
+})();
+</script>
+
+</body></html>
